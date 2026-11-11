@@ -10,3 +10,4 @@ agent/.chrome-profile/
 # demo recording scratch
 demo/.work/
 .DS_Store
+server.log
