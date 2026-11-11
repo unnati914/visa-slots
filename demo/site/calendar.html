@@ -1,0 +1,31 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Test visa calendar</title>
+<style>
+body{margin:0;font:15px/1.4 system-ui,-apple-system,sans-serif;background:#fff;color:#1d2433}
+.top{background:#33415c;color:#fff;padding:10px 16px;font-weight:600;display:flex;justify-content:space-between}
+.top span{font-weight:500;font-size:12px;background:#f2b84b;color:#1d2433;border-radius:4px;padding:2px 7px}
+.wrap{padding:14px 16px}
+label{font-weight:600;font-size:13px;display:block;margin-bottom:5px}
+select{font:inherit;padding:6px 8px;border:1px solid #c7ccd6;border-radius:5px;min-width:200px}
+#out{margin-top:14px;border-radius:8px;padding:12px;font-weight:600;text-align:center;background:#f4f1f1;transition:background .3s}
+#out.yes{background:#dff3e6;color:#17663e}
+.d{display:inline-block;margin:4px;padding:4px 9px;border-radius:6px;background:#fff;border:1px solid #9fd3b3;font-variant-numeric:tabular-nums}
+</style></head><body>
+<div class="top">Visa appointment calendar <span>TEST COPY · simulated slots</span></div>
+<div class="wrap">
+<label>OFC Post</label>
+<select id="post_select"><option value="">Select</option><option value="p1">NEW DELHI VAC</option><option value="p2">MUMBAI VAC</option><option value="p3">CHENNAI VAC</option><option value="p4">HYDERABAD VAC</option><option value="p5">KOLKATA VAC</option></select>
+<div id="out">Pick a post</div>
+</div>
+<script>
+const sel=document.getElementById('post_select'),out=document.getElementById('out');
+async function load(){
+  if(!sel.value)return;
+  const r=await fetch('/en-US/custom-actions/?route=/api/v1/schedule-group/get-family-ofc-schedule-days&postId='+sel.value,{method:'POST'});
+  const days=(await r.json()).ScheduleDays.map(d=>d.Date);
+  out.className=days.length?'yes':'';
+  out.innerHTML=days.length?`${days.length} slots available<br>`+days.map(d=>`<span class="d">${d}</span>`).join(''):'No Slots Available';
+}
+sel.addEventListener('change',load);
+const q=new URLSearchParams(location.search);
+if(q.get('view')){sel.value=q.get('post')||'p2';load();setInterval(load,500)}
+</script></body></html>

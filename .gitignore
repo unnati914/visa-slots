@@ -1,0 +1,12 @@
+# build output
+bin/
+# dependencies
+node_modules/
+# agent: personal settings, saved login session, logs
+agent/config.json
+agent/state.json
+agent/agent.log
+agent/.chrome-profile/
+# demo recording scratch
+demo/.work/
+.DS_Store

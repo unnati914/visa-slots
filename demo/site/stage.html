@@ -1,0 +1,82 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Visa agent latency demo</title>
+<style>
+:root{--bg:#f3efe8;--card:#fffdf9;--ink:#24262b;--mute:#7a7468;--line:#e3ddd2;--accent:#3d5a80;--good:#2f7d55;--goodbg:#e2f1e7;--warm:#e07a5f}
+*{box-sizing:border-box}
+body{margin:0;width:1280px;height:720px;overflow:hidden;background:var(--bg);color:var(--ink);font:15px/1.4 ui-rounded,system-ui,-apple-system,sans-serif}
+header{height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 24px}
+h1{margin:0;font-size:22px;letter-spacing:-.01em}
+h1 small{font-weight:500;color:var(--mute);font-size:14px;margin-left:8px}
+.chips{display:flex;gap:10px}
+.chip{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:6px 14px;font-size:14px;color:var(--mute)}
+.chip b{color:var(--ink);font-variant-numeric:tabular-nums;margin-left:4px}
+.chip.hot b{color:var(--good)}
+main{position:absolute;top:64px;left:24px;right:24px;bottom:132px;display:grid;grid-template-columns:440px 1fr;gap:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;min-height:0}
+.card h2{margin:0;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--mute);padding:9px 14px;border-bottom:1px solid var(--line)}
+.left{display:grid;grid-template-rows:225px 1fr;gap:16px;min-height:0}
+iframe{border:0;width:100%;flex:1;background:#fff}
+#log{flex:1;margin:0;padding:10px 14px;font:13px/1.55 ui-monospace,Menlo,monospace;color:#3a3d44;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end}
+#log div{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#log .hit{color:var(--good);font-weight:700}
+#caption{position:absolute;left:50%;top:84px;transform:translate(-50%,-10px);opacity:0;transition:all .45s;background:var(--ink);color:#fff;font-size:27px;font-weight:650;padding:12px 26px;border-radius:14px;white-space:nowrap;z-index:5;box-shadow:0 10px 30px rgba(0,0,0,.18)}
+#caption.on{opacity:1;transform:translate(-50%,0)}
+footer{position:absolute;left:24px;right:24px;bottom:16px;height:100px;display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.step{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 16px;opacity:.45;transition:all .4s}
+.step.on{opacity:1;border-color:var(--good);box-shadow:0 0 0 3px var(--goodbg)}
+.step .n{font-size:12px;color:var(--mute);text-transform:uppercase;letter-spacing:.05em}
+.step .t{font-size:17px;font-weight:650;margin-top:2px}
+.step .v{font-size:24px;font-weight:750;color:var(--good);font-variant-numeric:tabular-nums;margin-top:2px}
+#phone{position:absolute;right:40px;bottom:150px;width:360px;background:rgba(250,250,252,.97);border-radius:20px;padding:14px 16px;box-shadow:0 18px 50px rgba(0,0,0,.25);transform:translateX(420px);transition:transform .5s cubic-bezier(.2,.9,.3,1.2);z-index:6}
+#phone.on{transform:none}
+#phone .app{font-size:12px;color:#8a8a8e;display:flex;justify-content:space-between}
+#phone .ti{font-weight:700;margin-top:4px}
+#phone .bo{font-size:14px;color:#333;margin-top:2px}
+#summary{position:absolute;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;transition:opacity .6s;z-index:10;pointer-events:none}
+#summary.on{opacity:1}
+#summary h3{font-size:34px;margin:0 0 22px}
+table{border-collapse:collapse;font-size:20px;background:var(--card);border-radius:16px;overflow:hidden;border:1px solid var(--line)}
+td{padding:13px 26px;border-bottom:1px solid var(--line)}
+td:last-child{font-weight:750;text-align:right;font-variant-numeric:tabular-nums}
+tr:last-child td{border-bottom:0}
+.ok{color:var(--good)}
+#summary p{color:var(--mute);font-size:17px;margin-top:20px;text-align:center;max-width:900px}
+</style></head>
+<body>
+<header>
+  <h1>Visa Slot Agent <small>live latency demo</small></h1>
+  <div class="chips">
+    <span class="chip">Users online<b id="users">0</b></span>
+    <span class="chip">Requests/s<b id="rps">0</b></span>
+    <span class="chip hot">Server p99<b id="p99">–</b></span>
+  </div>
+</header>
+<div id="caption"></div>
+<main>
+  <div class="left">
+    <div class="card"><h2>Visa website (test copy)</h2><iframe src="/calendar.html?view=1&post=p2"></iframe></div>
+    <div class="card"><h2>Agent log</h2><div id="log"></div></div>
+  </div>
+  <div class="card"><h2>Dashboard: what users see (India)</h2><iframe id="dash" src="about:blank"></iframe></div>
+</main>
+<footer>
+  <div class="step" id="s1"><div class="n">Step 1</div><div class="t">Slot opens</div><div class="v" id="v1">&nbsp;</div></div>
+  <div class="step" id="s2"><div class="n">Step 2</div><div class="t">Agent finds it</div><div class="v" id="v2">&nbsp;</div></div>
+  <div class="step" id="s3"><div class="n">Step 3</div><div class="t">Dashboard shows it</div><div class="v" id="v3">&nbsp;</div></div>
+  <div class="step" id="s4"><div class="n">Step 4</div><div class="t">Phone alert</div><div class="v" id="v4">&nbsp;</div></div>
+</footer>
+<div id="phone"><div class="app"><span>ntfy</span><span>now</span></div><div class="ti" id="pt"></div><div class="bo" id="pb"></div></div>
+<div id="summary"><h3>Measured latency</h3><table id="sumtable"></table><p id="sumnote"></p></div>
+<script>
+const $=id=>document.getElementById(id);
+window.stage={
+  caption(t){const c=$("caption");c.classList.remove("on");setTimeout(()=>{if(t){c.textContent=t;c.classList.add("on")}},250)},
+  stats(u,rps,p99){$("users").textContent=u.toLocaleString("en-US");$("rps").textContent=rps.toLocaleString("en-US");$("p99").textContent=p99},
+  log(line,hit){const d=document.createElement("div");d.textContent=line;if(hit)d.className="hit";const L=$("log");L.appendChild(d);while(L.children.length>13)L.firstChild.remove()},
+  step(i,v){$("s"+i).classList.add("on");$("v"+i).textContent=v},
+  phone(t,b){$("pt").textContent=t;$("pb").textContent=b;$("phone").classList.add("on")},
+  dash(url){$("dash").src=url},
+  summary(rows,note){$("sumtable").innerHTML=rows.map(r=>`<tr><td>${r[0]}</td><td class="${r[2]||""}">${r[1]}</td></tr>`).join("");$("sumnote").textContent=note;$("summary").classList.add("on")}
+};
+</script>
+</body></html>

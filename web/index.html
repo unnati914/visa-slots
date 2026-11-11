@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>US Visa Slots</title>
+<style>
+:root{--bg:#f7f7f5;--card:#fff;--ink:#1b1d21;--mute:#6b7079;--line:#e4e4e0;--accent:#2457d6;--good:#1a7f4b;--goodbg:#e3f4ea;--warn:#a15c00;--warnbg:#fff1dc;--flash:#fff6c2}
+@media (prefers-color-scheme:dark){:root{--bg:#121316;--card:#1b1d22;--ink:#e9eaee;--mute:#9298a3;--line:#2b2e35;--accent:#7aa2ff;--good:#57d18e;--goodbg:#173325;--warn:#ffb54d;--warnbg:#3a2a12;--flash:#3d3815}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+header{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;padding:18px 20px 10px;max-width:1200px;margin:auto}
+h1{font-size:20px;margin:0;letter-spacing:-.01em}
+.live{display:flex;gap:14px;align-items:center;color:var(--mute);font-size:13px}
+.dot{width:8px;height:8px;border-radius:50%;background:#aaa;display:inline-block;margin-right:6px;vertical-align:middle}
+.dot.on{background:var(--good);box-shadow:0 0 0 0 var(--good);animation:pulse 2s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(26,127,75,.5)}70%{box-shadow:0 0 0 7px rgba(26,127,75,0)}100%{box-shadow:0 0 0 0 rgba(26,127,75,0)}}
+main{max-width:1200px;margin:auto;padding:0 20px 40px}
+.banner{background:var(--warnbg);color:var(--warn);border-radius:8px;padding:8px 12px;margin-bottom:12px;font-size:13px}
+.controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:12px}
+select,input{font:inherit;color:inherit;background:var(--bg);border:1px solid var(--line);border-radius:7px;padding:6px 9px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:4px 11px;cursor:pointer;font-size:13px;color:inherit}
+.chip.on{background:var(--accent);border-color:var(--accent);color:#fff}
+label.chk{display:flex;gap:6px;align-items:center;color:var(--mute);font-size:13px}
+.sp{flex:1}
+.tablewrap{background:var(--card);border:1px solid var(--line);border-radius:10px;overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:760px}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
+th{font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--mute);font-weight:600;position:sticky;top:0;background:var(--card)}
+tr:last-child td{border-bottom:none}
+td.city b{font-weight:600}
+td.city span{color:var(--mute);font-size:12px;margin-left:6px}
+.date{font-variant-numeric:tabular-nums;font-weight:600}
+.soon{color:var(--good)}
+.none{color:var(--mute);font-weight:400}
+.pill{font-size:12px;border-radius:5px;padding:1px 7px;background:var(--bg);border:1px solid var(--line)}
+.pill.drop{background:var(--goodbg);border-color:transparent;color:var(--good)}
+.more{color:var(--mute);font-size:12px;font-variant-numeric:tabular-nums}
+.ago{color:var(--mute);font-size:12px}
+tr.flash td{animation:fl 2.2s ease-out}
+@keyframes fl{0%{background:var(--flash)}100%{background:transparent}}
+.foot{display:flex;flex-wrap:wrap;gap:8px 18px;color:var(--mute);font-size:12px;margin-top:12px}
+.src.bad{color:var(--warn)}
+.empty{padding:30px;text-align:center;color:var(--mute)}
+@media (max-width:640px){header,main{padding-left:16px;padding-right:16px}}
+</style>
+</head>
+<body>
+<header>
+  <h1>US Visa Slots</h1>
+  <div class="live">
+    <span><span id="dot" class="dot"></span><span id="conn">connecting</span></span>
+    <span id="updated"></span>
+    <span id="p99" title="Server-side p99 response time"></span>
+  </div>
+</header>
+<main>
+  <div id="banner" class="banner" hidden></div>
+  <div class="controls">
+    <select id="country"><option value="">All countries: earliest slots</option></select>
+    <div class="chips" id="visas"></div>
+    <select id="cat"><option value="">Regular + Dropbox</option><option>Regular</option><option>Dropbox</option></select>
+    <input id="q" placeholder="Filter city" size="12">
+    <label class="chk"><input type="checkbox" id="openOnly" checked> Open only</label>
+    <span class="sp"></span>
+    <label class="chk">Alert if before <input type="date" id="alertDate"></label>
+  </div>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>Post</th><th>Visa</th><th>Type</th><th>Earliest</th><th>Next dates</th><th>Open</th><th>Changed</th><th>Source</th></tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+    <div id="empty" class="empty" hidden></div>
+  </div>
+  <div class="foot" id="sources"></div>
+</main>
+<script>
+const VISAS=["B1/B2","F1/M1","J1","H1B","L1","O1","C1/D"];
+const $=id=>document.getElementById(id);
+const st={country:"",visa:"",cat:"",q:"",openOnly:true,rows:new Map(),version:0,updatedAt:0,flash:new Set()};
+try{const s=JSON.parse(localStorage.getItem("vs-filters")||"{}");Object.assign(st,{country:s.country||"",visa:s.visa||"",cat:s.cat||""});$("alertDate").value=s.alert||""}catch{}
+{const c=new URLSearchParams(location.search).get("country");if(c)st.country=c.toUpperCase()}
+const save=()=>{try{localStorage.setItem("vs-filters",JSON.stringify({country:st.country,visa:st.visa,cat:st.cat,alert:$("alertDate").value}))}catch{}};
+
+// Visa chips
+const chipBox=$("visas");
+["",...VISAS].forEach(v=>{const b=document.createElement("button");b.className="chip";b.textContent=v||"All visas";b.dataset.v=v;b.onclick=()=>{st.visa=v;save();syncChips();load()};chipBox.appendChild(b)});
+const syncChips=()=>chipBox.querySelectorAll(".chip").forEach(b=>b.classList.toggle("on",b.dataset.v===st.visa));
+syncChips();
+$("cat").value=st.cat;
+$("cat").onchange=e=>{st.cat=e.target.value;save();render()};
+$("q").oninput=e=>{st.q=e.target.value.toLowerCase();render()};
+$("openOnly").onchange=e=>{st.openOnly=e.target.checked;render()};
+$("country").onchange=e=>{st.country=e.target.value;st.version=0;save();connect()};
+$("alertDate").onchange=()=>{save();if($("alertDate").value&&"Notification"in window&&Notification.permission==="default")Notification.requestPermission()};
+
+async function getJSON(u){const r=await fetch(u);if(!r.ok)throw new Error(r.status);return r.json()}
+
+async function loadCountries(){
+  const d=await getJSON("/api/countries");const sel=$("country");
+  sel.length=1;
+  d.countries.forEach(c=>{const o=document.createElement("option");o.value=c.cc;o.textContent=`${c.country} (${c.posts})`;sel.appendChild(o)});
+  sel.value=st.country;
+}
+
+let loading=0;
+async function load(){
+  const my=++loading;
+  const url=st.country?`/api/slots?country=${st.country}`:`/api/earliest?visa=${encodeURIComponent(st.visa)}`;
+  try{
+    const d=await getJSON(url);if(my!==loading)return;
+    st.rows=new Map(d.rows.map(r=>[r.key,r]));st.version=d.version;st.updatedAt=d.updatedAt;render();
+  }catch(e){console.warn(e)}
+}
+
+const today=new Date().toISOString().slice(0,10);
+const days=d=>Math.round((new Date(d)-new Date(today))/864e5);
+const ago=ms=>{const s=Math.max(0,Math.round((Date.now()-ms)/1000));return s<60?s+"s ago":s<3600?Math.round(s/60)+"m ago":Math.round(s/3600)+"h ago"};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+function visible(){
+  let rows=[...st.rows.values()].filter(r=>(!st.visa||r.visa===st.visa)&&(!st.cat||r.cat===st.cat)&&(!st.openOnly||r.open>0)&&(!st.q||r.city.toLowerCase().includes(st.q)||r.country.toLowerCase().includes(st.q)));
+  rows.sort((a,b)=>(a.earliest||"9999").localeCompare(b.earliest||"9999")||a.city.localeCompare(b.city));
+  return rows.slice(0,400);
+}
+function render(){
+  const rows=visible();
+  $("rows").innerHTML=rows.map(r=>{
+    const d=r.earliest?days(r.earliest):null;
+    const early=r.earliest?`<span class="date ${d<=30?"soon":""}">${r.earliest}</span> <span class="more">${d}d</span>`:`<span class="date none">none</span>`;
+    const next=(r.dates||[]).slice(1,4).join(", ");
+    return `<tr class="${st.flash.has(r.key)?"flash":""}"><td class="city"><b>${esc(r.city)}</b><span>${esc(r.country)}</span></td><td>${esc(r.visa)}</td><td><span class="pill ${r.cat==="Dropbox"?"drop":""}">${esc(r.cat)}</span></td><td>${early}</td><td class="more">${next}</td><td>${r.open}</td><td class="ago">${ago(r.changed)}</td><td class="ago">${esc(r.source)}</td></tr>`}).join("");
+  $("empty").hidden=rows.length>0;
+  $("empty").textContent=st.rows.size?"No open slots match these filters right now.":"No slots reported yet. Install the browser agent (extension folder), sign in to your visa account, and keep the appointment page open.";
+  st.flash.clear();
+}
+
+// Live updates
+let refetchTimer=null,es=null;
+function connect(){
+  if(es)es.close();
+  es=new EventSource("/api/stream"+(st.country?`?country=${st.country}`:""));
+  es.addEventListener("hello",()=>{$("dot").classList.add("on");$("conn").textContent="live";load()});
+  es.addEventListener("diff",e=>{
+    const d=JSON.parse(e.data);
+    if(st.version&&d.v!==st.version+1&&st.country){st.version=d.v;load();return}
+    st.version=d.v;st.updatedAt=Date.now();
+    alertCheck(d.changed);
+    if(!st.country){clearTimeout(refetchTimer);refetchTimer=setTimeout(load,300+Math.random()*1500);return}
+    for(const r of d.changed)if(r.cc===st.country){st.rows.set(r.key,r);st.flash.add(r.key)}
+    for(const k of d.removed||[])st.rows.delete(k);
+    render();
+  });
+  es.onerror=()=>{$("dot").classList.remove("on");$("conn").textContent="reconnecting"};
+}
+function alertCheck(changed){
+  const lim=$("alertDate").value;if(!lim||!("Notification"in window)||Notification.permission!=="granted")return;
+  const hit=changed.find(r=>r.earliest&&r.earliest<lim&&(!st.visa||r.visa===st.visa)&&(!st.cat||r.cat===st.cat)&&(!st.country||r.cc===st.country));
+  if(hit)new Notification(`Slot: ${hit.city} ${hit.visa} ${hit.cat}`,{body:`Earliest ${hit.earliest}`,tag:hit.key});
+}
+
+async function pollMeta(){
+  try{
+    const [m,s]=await Promise.all([getJSON("/metrics"),getJSON("/api/sources")]);
+    const p=m.server_latency.p99_us;$("p99").textContent=`server p99 ${p<1000?p.toFixed(0)+" µs":(p/1000).toFixed(2)+" ms"}`;
+    const mock=s.sources.some(x=>x.name.startsWith("mock:"));
+    $("banner").hidden=!mock;$("banner").textContent="Simulated data is ON (server started with -mock). Rows from mock:* sources are not real; rows from browser-agent are.";
+    $("sources").innerHTML=s.sources.map(x=>`<span class="src ${x.healthy?"":"bad"}">${esc(x.name)}: ${x.rows} rows, fetch ${x.fetchMs} ms${x.consecutiveFailures?`, ${x.consecutiveFailures} failures`:""}</span>`).join("")+`<span>${m.sse_clients} live viewers</span>`;
+  }catch{}
+}
+setInterval(()=>{if(st.updatedAt)$("updated").textContent="updated "+ago(st.updatedAt)},1000);
+setInterval(pollMeta,5000);
+
+loadCountries().then(load);pollMeta();connect();
+</script>
+</body>
+</html>

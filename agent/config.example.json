@@ -1,0 +1,12 @@
+{
+  "country": "IN",
+  "visa": "F1/M1",
+  "cat": "Regular",
+  "alertBefore": "2026-12-30",
+  "minutes": 10,
+  "server": "http://localhost:8080",
+  "ntfyTopic": "",
+  "telegramToken": "",
+  "telegramChatId": "",
+  "startUrl": "https://www.usvisascheduling.com/en-US/"
+}

@@ -1,0 +1,29 @@
+{
+  "manifest_version": 3,
+  "name": "Visa Slot Agent",
+  "version": "1.0.0",
+  "description": "Checks your own logged-in US visa account for open appointment slots, alerts you, and shares them with your slots dashboard.",
+  "permissions": ["storage", "alarms", "notifications", "tabs"],
+  "host_permissions": ["https://ais.usvisa-info.com/*", "https://www.usvisascheduling.com/*"],
+  "background": { "service_worker": "background.js" },
+  "action": { "default_popup": "popup.html", "default_icon": "icon.png" },
+  "icons": { "128": "icon.png" },
+  "content_scripts": [
+    {
+      "matches": ["https://ais.usvisa-info.com/*/niv/schedule/*/appointment*"],
+      "js": ["lib.js", "ais.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://www.usvisascheduling.com/*"],
+      "js": ["lib.js", "cgi-hook.js"],
+      "world": "MAIN",
+      "run_at": "document_start"
+    },
+    {
+      "matches": ["https://www.usvisascheduling.com/*"],
+      "js": ["lib.js", "cgi.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}
