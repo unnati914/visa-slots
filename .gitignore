@@ -11,3 +11,8 @@ agent/.chrome-profile/
 demo/.work/
 .DS_Store
 server.log
+# alerts, push keys
+data/
+
+# deploy build
+bin/visa-slots-linux

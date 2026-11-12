@@ -99,7 +99,7 @@ func (m *MockSource) Fetch(ctx context.Context) ([]Row, error) {
 					}
 				}
 				r := Row{Key: k, CC: p.CC, Country: p.Country, City: p.City, Visa: v, Category: c,
-					Open: st.open, CheckedAt: now.UnixMilli()}
+					Open: st.open, CheckedAt: now.UnixMilli(), Confirmed: true, Via: "extension"}
 				if st.earliestDay >= 0 && st.open > 0 {
 					for i := 0; i < min(st.open, 5); i++ {
 						r.Dates = append(r.Dates, today.AddDate(0, 0, st.earliestDay+i*(1+i%3)).Format("2006-01-02"))

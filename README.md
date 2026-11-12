@@ -97,3 +97,35 @@ Before scraping the official booking sites (ais.usvisa-info.com, usvisaschedulin
 they require a login, use CAPTCHAs, and their terms forbid automated access. Accounts that
 poll them can get locked. Safer options are crowdsourced reports (users or a browser
 extension submit what they see) or a data partner.
+
+## Crowdsourced: extension + Telegram + phone app
+
+All three feed the same pool (`POST /api/report` or the bot) and get alerts from the same watch list.
+
+| Channel | How data comes in | Trust |
+|---|---|---|
+| Chrome extension | Reads the calendar in the user's own visa account | Confirmed at once (official site data) |
+| Telegram bot | `/report Mumbai F1 3 Dec` | Confirmed when a 2nd person reports the same post |
+| Phone app (PWA) | Report tab | Same as Telegram (one vote per IP) |
+
+Alerts fire only for confirmed rows: new opening, or an earlier date than last alerted.
+
+### Telegram bot
+1. In Telegram, message **@BotFather** → `/newbot` → copy the token.
+2. Locally: `TELEGRAM_BOT_TOKEN=... ./bin/server`
+   On Fly: `fly secrets set TELEGRAM_BOT_TOKEN=...`
+Commands: `/watch` (guided with buttons), `/slots India`, `/report Mumbai F1 3 Dec`, `/mine`, `/stop`.
+The web app's Alerts tab shows an "Open in Telegram" button that pre-fills the alert.
+
+### Phone app
+The site is an installable app (manifest + service worker + Web Push). Android/desktop: "Install".
+iPhone: Share → Add to Home Screen, then turn on alerts (iOS 16.4+). Push keys are made on first start in `data/`.
+
+### Deploy (Fly)
+```
+fly auth login
+fly launch --no-deploy --copy-config    # first time only
+fly volumes create visa_data --region bom --size 1
+fly secrets set TELEGRAM_BOT_TOKEN=...  # optional
+fly deploy
+```

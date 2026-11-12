@@ -48,7 +48,7 @@ async function runCheck() {
       if (!r.posts?.length) continue;
 
       const cc = (r.cc || s.country || "").toUpperCase();
-      const report = { agent: "vsa-ext/1.0", system: r.system, cc, visa: s.visa, cat: s.cat, checkedAt: Date.now(), posts: r.posts };
+      const report = { agent: "vsa-ext/1.1", via: "extension", system: r.system, cc, visa: s.visa, cat: s.cat, checkedAt: Date.now(), posts: r.posts };
       try {
         const res = await fetch(s.server.replace(/\/$/, "") + "/api/report", {
           method: "POST",

@@ -23,15 +23,19 @@ type Row struct {
 	Dates     []string `json:"dates,omitempty"`    // next few open dates
 	Open      int      `json:"open"`               // number of open dates seen
 	Source    string   `json:"source"`
-	CheckedAt int64    `json:"checked"` // unix ms of the fetch that produced this row
-	ChangedAt int64    `json:"changed"` // unix ms when availability last changed
+	Via       string   `json:"via,omitempty"`     // extension (read from the official site), telegram or app (typed by a person)
+	Reports   int      `json:"reports,omitempty"` // distinct people who reported this row recently
+	Confirmed bool     `json:"ok,omitempty"`      // read by the extension, or matched by 2+ people
+	CheckedAt int64    `json:"checked"`           // unix ms of the fetch that produced this row
+	ChangedAt int64    `json:"changed"`           // unix ms when availability last changed
 }
 
 func rowKey(cc, city, visa, cat string) string { return cc + "|" + city + "|" + visa + "|" + cat }
 
 // sameAvailability ignores timestamps and source, so re-checks with no change are not broadcast.
 func sameAvailability(a, b Row) bool {
-	if a.Earliest != b.Earliest || a.Open != b.Open || len(a.Dates) != len(b.Dates) {
+	if a.Earliest != b.Earliest || a.Open != b.Open || len(a.Dates) != len(b.Dates) ||
+		a.Confirmed != b.Confirmed || a.Reports != b.Reports {
 		return false
 	}
 	for i := range a.Dates {

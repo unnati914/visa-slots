@@ -1,0 +1,18 @@
+# Render Blueprint: free web service. Singapore is Render's closest region to India.
+# Free services sleep after 15 min without visits; the app pings itself to stay awake.
+# The disk is wiped on restart, so alerts are kept in a free Upstash Redis.
+services:
+  - type: web
+    name: visa-slots
+    runtime: docker
+    plan: free
+    region: singapore
+    healthCheckPath: /api/config
+    autoDeploy: true
+    envVars:
+      - key: UPSTASH_REDIS_REST_URL
+        sync: false
+      - key: UPSTASH_REDIS_REST_TOKEN
+        sync: false
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false

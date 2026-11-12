@@ -54,6 +54,10 @@ type Agent struct {
 	status   map[string]*SourceStatus
 	version  uint64
 	statusMu sync.Mutex
+
+	// OnChange, if set, gets every row whose availability changed (removed rows come
+	// with Open 0). It runs on the merge goroutine, so it must not block.
+	OnChange func([]Row)
 }
 
 func NewAgent(store *Store, hub *Hub, sources ...Source) *Agent {
@@ -217,6 +221,17 @@ func (a *Agent) apply(batch []fetchResult) {
 	}
 	tick, _ := json.Marshal(diff{Version: a.version, Changed: []Row{}})
 	a.hub.Broadcast("diff", frames, tick)
+
+	if a.OnChange != nil && (len(changed) > 0 || len(removed) > 0) {
+		out := append([]Row(nil), changed...)
+		for _, k := range removed {
+			p := strings.SplitN(k, "|", 4)
+			if len(p) == 4 {
+				out = append(out, Row{Key: k, CC: p[0], City: p[1], Visa: p[2], Category: p[3]})
+			}
+		}
+		a.OnChange(out)
+	}
 }
 
 func (a *Agent) statusList() []SourceStatus {

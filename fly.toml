@@ -5,6 +5,15 @@ primary_region = "bom"
 
 [build]
 
+[env]
+  SITE_URL = "https://visa-slots.fly.dev"
+
+# Alerts, push keys and Telegram subscribers live here and survive deploys.
+# Create once with: fly volumes create visa_data --region bom --size 1
+[mounts]
+  source = "visa_data"
+  destination = "/data"
+
 [http_service]
   internal_port = 8080
   force_https = true

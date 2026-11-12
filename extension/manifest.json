@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Visa Slot Agent",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Checks your own logged-in US visa account for open appointment slots, alerts you, and shares them with your slots dashboard.",
   "permissions": ["storage", "alarms", "notifications", "tabs"],
   "host_permissions": ["https://ais.usvisa-info.com/*", "https://www.usvisascheduling.com/*"],

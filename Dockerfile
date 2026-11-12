@@ -6,7 +6,9 @@ COPY *.go ./
 COPY web ./web
 RUN CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o /server .
 
-FROM gcr.io/distroless/static-debian12:nonroot
+# Runs as root so it can write to the Fly volume mounted at /data.
+FROM gcr.io/distroless/static-debian12
 COPY --from=build /server /server
 EXPOSE 8080
+ENV DATA_DIR=/data
 ENTRYPOINT ["/server"]

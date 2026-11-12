@@ -131,11 +131,24 @@ function nextCapture(ms) {
   });
 }
 
+// Minimizes or restores the agent's own Chrome window, so it stays out of your way
+// and only pops up when it needs you (logged out, calendar page lost).
+async function setWindow(page, windowState) {
+  if (process.env.VSA_HEADLESS || cfg.minimize === false) return;
+  try {
+    const s = await page.context().newCDPSession(page);
+    const { windowId } = await s.send("Browser.getWindowForTarget");
+    await s.send("Browser.setWindowBounds", { windowId, bounds: { windowState } });
+    await s.detach();
+  } catch {}
+}
+
 // ---------- one check of every consulate ----------
+// Returns false when it needs you (logged out or not on the calendar page).
 async function check(page) {
   if (await signedOut(page)) {
     await alert("Visa agent: logged out", "Log in again in the agent's Chrome window, then open the calendar page.", { key: "out", everyMin: 30 });
-    return;
+    return false;
   }
   let opts = await postOptions(page);
   if (!opts && state.calendarUrl) {
@@ -146,7 +159,7 @@ async function check(page) {
   }
   if (!opts) {
     await alert("Visa agent: needs the calendar page", "Open Schedule/Reschedule Appointment in the agent's Chrome window.", { key: "nocal", everyMin: 30 });
-    return;
+    return false;
   }
 
   for (let i = 0; i < opts.length; i++) {
@@ -165,6 +178,7 @@ async function check(page) {
     await Promise.all([report(p), alertFor(p)]);
   }
   saveState();
+  return true;
 }
 
 async function report(p) {
@@ -204,7 +218,13 @@ Visa slot agent
   Phone alerts: install the free "ntfy" app, tap +, subscribe to topic:  ${cfg.ntfyTopic}
   (settings live in agent/config.json)
 `);
-  const context = await chromium.launchPersistentContext(PROFILE, { channel: "chrome", headless: !!process.env.VSA_HEADLESS, viewport: null });
+  const context = await chromium.launchPersistentContext(PROFILE, {
+    channel: "chrome",
+    headless: !!process.env.VSA_HEADLESS,
+    viewport: null,
+    // keep checking at full speed while the window is minimized or behind other windows
+    args: ["--disable-background-timer-throttling", "--disable-backgrounding-occluded-windows", "--disable-renderer-backgrounding"],
+  });
   watchResponses(context);
   const page = context.pages()[0] || (await context.newPage());
   context.on("close", () => {
@@ -221,11 +241,16 @@ Visa slot agent
   }
   state.calendarUrl = page.url();
   saveState();
-  log("Calendar page found. Checking now, then every", cfg.minutes, "minutes. Leave the window open.");
+  log("Calendar page found. Checking now, then every", cfg.minutes, "minutes. The window is minimized; it comes back only if it needs you.");
+  await setWindow(page, "minimized");
 
+  let needsYou = false;
   for (;;) {
     try {
-      await check(page);
+      const ok = await check(page);
+      if (!ok && !needsYou) await setWindow(page, "normal");
+      if (ok && needsYou) await setWindow(page, "minimized");
+      needsYou = !ok;
     } catch (e) {
       log("check failed:", e.message);
     }

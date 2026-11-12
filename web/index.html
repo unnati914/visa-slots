@@ -2,177 +2,523 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>US Visa Slots</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Visa Slots</title>
+<meta name="description" content="Live US visa appointment slots, shared by applicants.">
+<meta name="theme-color" content="#f6f5f1" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0f1012" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Slots">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/icons/favicon.png">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
 <style>
-:root{--bg:#f7f7f5;--card:#fff;--ink:#1b1d21;--mute:#6b7079;--line:#e4e4e0;--accent:#2457d6;--good:#1a7f4b;--goodbg:#e3f4ea;--warn:#a15c00;--warnbg:#fff1dc;--flash:#fff6c2}
-@media (prefers-color-scheme:dark){:root{--bg:#121316;--card:#1b1d22;--ink:#e9eaee;--mute:#9298a3;--line:#2b2e35;--accent:#7aa2ff;--good:#57d18e;--goodbg:#173325;--warn:#ffb54d;--warnbg:#3a2a12;--flash:#3d3815}}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
-header{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;padding:18px 20px 10px;max-width:1200px;margin:auto}
-h1{font-size:20px;margin:0;letter-spacing:-.01em}
-.live{display:flex;gap:14px;align-items:center;color:var(--mute);font-size:13px}
-.dot{width:8px;height:8px;border-radius:50%;background:#aaa;display:inline-block;margin-right:6px;vertical-align:middle}
-.dot.on{background:var(--good);box-shadow:0 0 0 0 var(--good);animation:pulse 2s infinite}
-@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(26,127,75,.5)}70%{box-shadow:0 0 0 7px rgba(26,127,75,0)}100%{box-shadow:0 0 0 0 rgba(26,127,75,0)}}
-main{max-width:1200px;margin:auto;padding:0 20px 40px}
-.banner{background:var(--warnbg);color:var(--warn);border-radius:8px;padding:8px 12px;margin-bottom:12px;font-size:13px}
-.controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:12px}
-select,input{font:inherit;color:inherit;background:var(--bg);border:1px solid var(--line);border-radius:7px;padding:6px 9px}
-.chips{display:flex;flex-wrap:wrap;gap:6px}
-.chip{border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:4px 11px;cursor:pointer;font-size:13px;color:inherit}
-.chip.on{background:var(--accent);border-color:var(--accent);color:#fff}
-label.chk{display:flex;gap:6px;align-items:center;color:var(--mute);font-size:13px}
-.sp{flex:1}
-.tablewrap{background:var(--card);border:1px solid var(--line);border-radius:10px;overflow-x:auto}
-table{border-collapse:collapse;width:100%;min-width:760px}
-th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
-th{font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--mute);font-weight:600;position:sticky;top:0;background:var(--card)}
-tr:last-child td{border-bottom:none}
-td.city b{font-weight:600}
-td.city span{color:var(--mute);font-size:12px;margin-left:6px}
-.date{font-variant-numeric:tabular-nums;font-weight:600}
-.soon{color:var(--good)}
-.none{color:var(--mute);font-weight:400}
-.pill{font-size:12px;border-radius:5px;padding:1px 7px;background:var(--bg);border:1px solid var(--line)}
-.pill.drop{background:var(--goodbg);border-color:transparent;color:var(--good)}
-.more{color:var(--mute);font-size:12px;font-variant-numeric:tabular-nums}
-.ago{color:var(--mute);font-size:12px}
-tr.flash td{animation:fl 2.2s ease-out}
-@keyframes fl{0%{background:var(--flash)}100%{background:transparent}}
-.foot{display:flex;flex-wrap:wrap;gap:8px 18px;color:var(--mute);font-size:12px;margin-top:12px}
-.src.bad{color:var(--warn)}
-.empty{padding:30px;text-align:center;color:var(--mute)}
-@media (max-width:640px){header,main{padding-left:16px;padding-right:16px}}
+:root{
+  --bg:#f6f5f1;--card:#fff;--ink:#16181d;--soft:#4a4f58;--mute:#8a8f98;--line:#e9e7e1;--fill:#efede8;
+  --accent:#0e7c5a;--accent-ink:#fff;--accent-soft:#e3f3ec;--amber:#a86200;--amber-soft:#fdf1df;
+  --shadow:0 1px 2px rgba(20,20,20,.04),0 4px 16px rgba(20,20,20,.04);
+  --r:18px;--gut:16px;
+  --sans:ui-sans-serif,-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){
+  --bg:#0f1012;--card:#18191c;--ink:#eeeff1;--soft:#b7bbc2;--mute:#7d828b;--line:#26282c;--fill:#202226;
+  --accent:#3ddc97;--accent-ink:#06261a;--accent-soft:#12291f;--amber:#f2b45a;--amber-soft:#2b2214;
+  --shadow:none}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{background:var(--bg)}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 var(--sans);-webkit-font-smoothing:antialiased;
+  padding-bottom:calc(84px + env(safe-area-inset-bottom))}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none;padding:0}
+.wrap{max-width:560px;margin:0 auto;padding:0 var(--gut)}
+[hidden]{display:none!important}
+
+/* top bar */
+.top{display:flex;align-items:center;justify-content:space-between;padding:calc(14px + env(safe-area-inset-top)) 0 6px}
+.brand{display:flex;align-items:center;gap:9px;font-weight:650;letter-spacing:-.01em;font-size:17px}
+.brand img{width:26px;height:26px;border-radius:7px}
+.live{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--mute)}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--mute)}
+.live.on .dot{background:var(--accent);animation:pulse 2.4s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--accent) 45%,transparent)}70%{box-shadow:0 0 0 7px transparent}100%{box-shadow:0 0 0 0 transparent}}
+
+h1{font-size:30px;line-height:1.1;letter-spacing:-.025em;margin:18px 0 6px;font-weight:700}
+.lede{color:var(--soft);margin:0 0 18px}
+
+/* country button + chips */
+.picker{display:flex;align-items:center;gap:10px;margin:14px 0 12px}
+.country{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:9px 14px 9px 12px;font-weight:600;box-shadow:var(--shadow)}
+.country .flag{font-size:18px;line-height:1}
+.country svg{width:14px;height:14px;color:var(--mute)}
+.chips{display:flex;gap:7px;overflow-x:auto;scrollbar-width:none;margin:0 calc(-1*var(--gut));padding:2px var(--gut) 4px}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;border:1px solid var(--line);background:var(--card);border-radius:999px;padding:7px 13px;font-size:14px;color:var(--soft);transition:.15s}
+.chip.on{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+
+/* hero */
+.hero{background:var(--card);border-radius:24px;padding:22px 22px 18px;margin:16px 0 22px;box-shadow:var(--shadow);border:1px solid var(--line)}
+.eyebrow{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--mute);font-weight:600}
+.big{font-size:44px;line-height:1.05;letter-spacing:-.035em;font-weight:700;margin:8px 0 6px;font-variant-numeric:tabular-nums}
+.hero .where{color:var(--soft);font-size:16px}
+.hero .meta{display:flex;align-items:center;gap:8px;margin-top:14px;font-size:13px;color:var(--mute);flex-wrap:wrap}
+.hero.empty .big{font-size:26px;letter-spacing:-.02em}
+.tag{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;border-radius:999px;padding:3px 9px}
+.tag.ok{background:var(--accent-soft);color:var(--accent)}
+.tag.wait{background:var(--amber-soft);color:var(--amber)}
+.tag.plain{background:var(--fill);color:var(--soft)}
+.tag svg{width:12px;height:12px}
+
+/* list */
+.sect{display:flex;justify-content:space-between;align-items:baseline;margin:6px 2px 8px}
+.sect h2{font-size:15px;margin:0;font-weight:650}
+.sect span{font-size:13px;color:var(--mute)}
+.list{background:var(--card);border-radius:var(--r);border:1px solid var(--line);box-shadow:var(--shadow);overflow:hidden}
+.row{display:grid;grid-template-columns:1fr auto;gap:2px 12px;padding:14px 16px;border-top:1px solid var(--line);width:100%;text-align:left}
+.row:first-child{border-top:0}
+.row .city{font-weight:600;letter-spacing:-.005em}
+.row .sub{font-size:13px;color:var(--mute);display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.row .when{text-align:right;font-weight:650;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.row .in{text-align:right;font-size:13px;color:var(--mute);font-variant-numeric:tabular-nums}
+.row .soon{color:var(--accent)}
+.row .more{grid-column:1/-1;display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.row .more span{font-size:12px;background:var(--fill);border-radius:7px;padding:3px 8px;color:var(--soft);font-variant-numeric:tabular-nums}
+.row.flash{animation:flash 2s ease-out}
+@keyframes flash{from{background:var(--accent-soft)}to{background:transparent}}
+.closed{font-size:13px;color:var(--mute);padding:12px 4px 0;line-height:1.6}
+
+/* forms */
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px;box-shadow:var(--shadow);margin-bottom:14px}
+.card h3{margin:0 0 4px;font-size:16px;letter-spacing:-.01em}
+.card p{margin:0;color:var(--soft);font-size:14px}
+.field{margin-bottom:16px}
+.field>label{display:block;font-size:13px;font-weight:600;color:var(--soft);margin-bottom:7px}
+.input{width:100%;appearance:none;-webkit-appearance:none;background:var(--fill);border:1px solid transparent;border-radius:12px;padding:12px 14px;font-size:16px;outline:none}
+.input:focus{border-color:var(--accent);background:var(--card)}
+select.input{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%238a8f98' stroke-width='2'%3E%3Cpath d='M2 4l4 4 4-4'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px}
+.wrapchips{display:flex;gap:7px;flex-wrap:wrap}
+.seg{display:flex;background:var(--fill);border-radius:12px;padding:3px}
+.seg button{flex:1;padding:9px;border-radius:10px;font-size:14px;color:var(--soft);font-weight:500}
+.seg button.on{background:var(--card);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.dates{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.dates button{display:flex;align-items:center;gap:6px;background:var(--accent-soft);color:var(--accent);border-radius:999px;padding:5px 10px;font-size:13px;font-weight:600}
+.inline{display:flex;gap:8px}
+.inline .input{flex:1}
+.switch{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:4px 0}
+.switch input{appearance:none;-webkit-appearance:none;width:46px;height:28px;border-radius:999px;background:var(--line);position:relative;transition:.2s;flex:none;cursor:pointer;margin:0}
+.switch input::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.2);transition:.2s}
+.switch input:checked{background:var(--accent)}
+.switch input:checked::after{left:21px}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;border-radius:14px;font-weight:650;font-size:16px;background:var(--ink);color:var(--bg);transition:transform .1s}
+.btn:active{transform:scale(.98)}
+.btn.accent{background:var(--accent);color:var(--accent-ink)}
+.btn.ghost{background:var(--fill);color:var(--ink)}
+.btn.small{width:auto;padding:10px 14px;font-size:14px;border-radius:12px}
+.btn[disabled]{opacity:.5;pointer-events:none}
+.btn svg{width:18px;height:18px}
+.opt{display:flex;gap:14px;align-items:flex-start}
+.opt .ic{flex:none;width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent)}
+.opt .ic.tg{background:#e5f2fb;color:#229ed9}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]) .opt .ic.tg{background:#11263a}}
+.opt .ic svg{width:20px;height:20px}
+.opt .body{flex:1;min-width:0}
+.opt .act{margin-top:12px}
+.note{font-size:13px;color:var(--mute);margin-top:10px;line-height:1.5}
+.mine{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-top:1px solid var(--line);gap:10px}
+.mine:first-of-type{border-top:0}
+.mine b{font-weight:600}
+.mine small{display:block;color:var(--mute)}
+.x{color:var(--mute);font-size:13px;padding:6px 10px;border-radius:9px;background:var(--fill)}
+
+/* bottom nav */
+nav{position:fixed;left:0;right:0;bottom:0;background:color-mix(in srgb,var(--bg) 82%,transparent);backdrop-filter:saturate(1.8) blur(18px);-webkit-backdrop-filter:saturate(1.8) blur(18px);border-top:1px solid var(--line);padding:8px 0 calc(8px + env(safe-area-inset-bottom));z-index:5}
+nav .wrap{display:flex;justify-content:space-around}
+nav button{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;font-weight:600;color:var(--mute);padding:4px 18px;border-radius:12px}
+nav button svg{width:23px;height:23px}
+nav button.on{color:var(--ink)}
+
+/* sheet */
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:10;opacity:0;transition:opacity .2s}
+.scrim.show{opacity:1}
+.sheet{position:fixed;left:0;right:0;bottom:0;max-width:560px;margin:0 auto;background:var(--card);border-radius:22px 22px 0 0;z-index:11;max-height:82vh;display:flex;flex-direction:column;transform:translateY(100%);visibility:hidden;transition:transform .25s cubic-bezier(.2,.8,.2,1),visibility 0s .25s;padding-bottom:env(safe-area-inset-bottom)}
+.sheet.show{transform:none;visibility:visible;transition:transform .25s cubic-bezier(.2,.8,.2,1)}
+.sheet .grab{width:38px;height:5px;border-radius:9px;background:var(--line);margin:9px auto 4px}
+.sheet .head{padding:8px 16px 10px}
+.sheet .opts{overflow-y:auto;padding:0 8px 12px}
+.sheet .opts button{display:flex;width:100%;align-items:center;gap:12px;padding:12px;border-radius:12px;text-align:left}
+.sheet .opts button:hover,.sheet .opts button.on{background:var(--fill)}
+.sheet .opts .flag{font-size:22px;width:28px;text-align:center}
+.sheet .opts small{margin-left:auto;color:var(--mute)}
+
+.toast{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom));transform:translate(-50%,20px);background:var(--ink);color:var(--bg);padding:12px 16px;border-radius:14px;font-size:14px;max-width:calc(100% - 32px);width:max-content;opacity:0;transition:.25s;z-index:20;pointer-events:none}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.skel{height:64px;border-top:1px solid var(--line);background:linear-gradient(90deg,transparent,var(--fill),transparent);background-size:200% 100%;animation:sk 1.2s infinite}
+@keyframes sk{from{background-position:200% 0}to{background-position:-200% 0}}
+@media (min-width:700px){h1{font-size:34px}.big{font-size:52px}}
 </style>
 </head>
 <body>
-<header>
-  <h1>US Visa Slots</h1>
-  <div class="live">
-    <span><span id="dot" class="dot"></span><span id="conn">connecting</span></span>
-    <span id="updated"></span>
-    <span id="p99" title="Server-side p99 response time"></span>
+<div class="wrap">
+  <div class="top">
+    <div class="brand"><img src="/icons/icon-192.png" alt="">Visa Slots</div>
+    <div class="live" id="live"><span class="dot"></span><span id="liveText">Connecting</span></div>
   </div>
-</header>
-<main>
-  <div id="banner" class="banner" hidden></div>
-  <div class="controls">
-    <select id="country"><option value="">All countries: earliest slots</option></select>
-    <div class="chips" id="visas"></div>
-    <select id="cat"><option value="">Regular + Dropbox</option><option>Regular</option><option>Dropbox</option></select>
-    <input id="q" placeholder="Filter city" size="12">
-    <label class="chk"><input type="checkbox" id="openOnly" checked> Open only</label>
-    <span class="sp"></span>
-    <label class="chk">Alert if before <input type="date" id="alertDate"></label>
-  </div>
-  <div class="tablewrap">
-    <table>
-      <thead><tr><th>Post</th><th>Visa</th><th>Type</th><th>Earliest</th><th>Next dates</th><th>Open</th><th>Changed</th><th>Source</th></tr></thead>
-      <tbody id="rows"></tbody>
-    </table>
-    <div id="empty" class="empty" hidden></div>
-  </div>
-  <div class="foot" id="sources"></div>
-</main>
+
+  <!-- SLOTS -->
+  <section id="tab-slots">
+    <div class="picker">
+      <button class="country" id="countryBtn"><span class="flag" id="flag">🌍</span><span id="countryName">Everywhere</span>
+        <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 4l4 4 4-4"/></svg></button>
+    </div>
+    <div class="chips" id="visaChips"></div>
+
+    <div class="hero" id="hero">
+      <div class="eyebrow" id="heroEyebrow">Earliest slot</div>
+      <div class="big" id="heroDate">&nbsp;</div>
+      <div class="where" id="heroWhere">&nbsp;</div>
+      <div class="meta" id="heroMeta"></div>
+    </div>
+
+    <div class="sect"><h2 id="listTitle">Open now</h2><span id="listCount"></span></div>
+    <div class="list" id="list"><div class="skel"></div><div class="skel"></div><div class="skel"></div></div>
+    <div class="closed" id="closed"></div>
+  </section>
+
+  <!-- REPORT -->
+  <section id="tab-report" hidden>
+    <h1>Share a slot</h1>
+    <p class="lede">Saw a date on the official booking site? Post it. When a second person reports the same post, it shows as confirmed for everyone.</p>
+    <div class="card">
+      <div class="field"><label for="rCountry">Country</label><select class="input" id="rCountry"></select></div>
+      <div class="field"><label for="rCity">Consulate</label><select class="input" id="rCity"></select></div>
+      <div class="field"><label>Visa</label><div class="wrapchips" id="rVisa"></div></div>
+      <div class="field"><label>Appointment</label><div class="seg" id="rCat"><button data-v="Regular" class="on">Interview</button><button data-v="Dropbox">Dropbox</button></div></div>
+      <div class="field switch"><div><b style="font-weight:600">Nothing open</b><div class="note" style="margin:0">I checked and there were no dates</div></div><input type="checkbox" id="rNone"></div>
+      <div class="field" id="rDateField"><label for="rDate">Dates you saw</label>
+        <div class="inline"><input class="input" type="date" id="rDate"><button class="btn ghost small" id="rAdd">Add</button></div>
+        <div class="dates" id="rDates"></div></div>
+      <button class="btn accent" id="rSend">Share slot</button>
+    </div>
+    <p class="note">Reports stay live for 45 minutes. Please only share what you saw yourself on the booking site.</p>
+  </section>
+
+  <!-- ALERTS -->
+  <section id="tab-alerts" hidden>
+    <h1>Get alerted</h1>
+    <p class="lede">We'll message you the moment a slot opens. You don't need to keep the app open.</p>
+    <div class="card">
+      <div class="field"><label for="aCountry">Country</label><select class="input" id="aCountry"></select></div>
+      <div class="field"><label for="aCity">Consulate</label><select class="input" id="aCity"></select></div>
+      <div class="field"><label>Visa</label><div class="wrapchips" id="aVisa"></div></div>
+      <div class="field" style="margin-bottom:0"><label for="aBefore">Only if before <span style="font-weight:400;color:var(--mute)">(optional)</span></label><input class="input" type="date" id="aBefore"></div>
+    </div>
+
+    <div class="card opt">
+      <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 1112 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 003.4 0"/></svg></div>
+      <div class="body"><h3>Phone notifications</h3><p id="pushText">An alert on this phone or computer, like any app.</p>
+        <div class="act"><button class="btn accent small" id="pushBtn">Turn on alerts</button></div></div>
+    </div>
+
+    <div class="card opt" id="tgCard" hidden>
+      <div class="ic tg"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M21.9 4.3l-3.2 15.1c-.2 1.1-.9 1.3-1.8.8l-4.9-3.6-2.4 2.3c-.3.3-.5.5-1 .5l.4-5 9.1-8.2c.4-.4-.1-.6-.6-.2L6.3 13 1.5 11.5c-1-.3-1.1-1 .2-1.5L20.6 2.8c.9-.3 1.6.2 1.3 1.5z"/></svg></div>
+      <div class="body"><h3>Telegram</h3><p>Alerts in a chat. You can also check slots and report from there.</p>
+        <div class="act"><a class="btn ghost small" id="tgBtn" target="_blank" rel="noopener" style="text-decoration:none;display:inline-flex">Open in Telegram</a></div></div>
+    </div>
+
+    <div class="card" id="mineCard" hidden><h3 style="margin-bottom:6px">On this device</h3><div id="mine"></div></div>
+
+    <div class="card opt" id="installCard" hidden>
+      <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="6" y="2" width="12" height="20" rx="3"/><path d="M11 18h2"/></svg></div>
+      <div class="body"><h3>Install the app</h3><p id="installText">Add it to your home screen. It opens like an app and works with alerts.</p>
+        <div class="act"><button class="btn ghost small" id="installBtn" hidden>Install</button></div></div>
+    </div>
+
+    <div class="card opt">
+      <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3.5"/><path d="M12 8.5h8.5M9 14l-4.3 6.3M15 14l4.3 6.2" stroke-width="1.6"/></svg></div>
+      <div class="body"><h3>Help everyone, automatically</h3><p>With the Chrome extension, your own visa account shares dates as you browse it. Those reports count as confirmed straight away.</p></div>
+    </div>
+  </section>
+</div>
+
+<nav><div class="wrap">
+  <button data-tab="slots" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>Slots</button>
+  <button data-tab="report"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>Report</button>
+  <button data-tab="alerts"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 1112 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 003.4 0"/></svg>Alerts</button>
+</div></nav>
+
+<div class="scrim" id="scrim" hidden></div>
+<div class="sheet" id="sheet" role="dialog" aria-label="Choose country">
+  <div class="grab"></div>
+  <div class="head"><input class="input" id="sheetQ" placeholder="Search country" autocomplete="off"></div>
+  <div class="opts" id="sheetOpts"></div>
+</div>
+<div class="toast" id="toast"></div>
+
 <script>
-const VISAS=["B1/B2","F1/M1","J1","H1B","L1","O1","C1/D"];
-const $=id=>document.getElementById(id);
-const st={country:"",visa:"",cat:"",q:"",openOnly:true,rows:new Map(),version:0,updatedAt:0,flash:new Set()};
-try{const s=JSON.parse(localStorage.getItem("vs-filters")||"{}");Object.assign(st,{country:s.country||"",visa:s.visa||"",cat:s.cat||""});$("alertDate").value=s.alert||""}catch{}
-{const c=new URLSearchParams(location.search).get("country");if(c)st.country=c.toUpperCase()}
-const save=()=>{try{localStorage.setItem("vs-filters",JSON.stringify({country:st.country,visa:st.visa,cat:st.cat,alert:$("alertDate").value}))}catch{}};
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const flag = (cc) => (cc ? String.fromCodePoint(...[...cc.toUpperCase()].map((c) => 127397 + c.charCodeAt(0))) : "🌍");
+const store = { get(k, d) { try { return JSON.parse(localStorage.getItem("vs:" + k)) ?? d; } catch { return d; } },
+                set(k, v) { try { localStorage.setItem("vs:" + k, JSON.stringify(v)); } catch {} } };
+const VISAS = ["B1/B2", "F1/M1", "J1", "H1B", "L1", "O1", "C1/D"];
+const VISA_NAMES = { "B1/B2": "Visitor", "F1/M1": "Student", J1: "Exchange", H1B: "Work", L1: "Transfer", O1: "Talent", "C1/D": "Crew" };
 
-// Visa chips
-const chipBox=$("visas");
-["",...VISAS].forEach(v=>{const b=document.createElement("button");b.className="chip";b.textContent=v||"All visas";b.dataset.v=v;b.onclick=()=>{st.visa=v;save();syncChips();load()};chipBox.appendChild(b)});
-const syncChips=()=>chipBox.querySelectorAll(".chip").forEach(b=>b.classList.toggle("on",b.dataset.v===st.visa));
-syncChips();
-$("cat").value=st.cat;
-$("cat").onchange=e=>{st.cat=e.target.value;save();render()};
-$("q").oninput=e=>{st.q=e.target.value.toLowerCase();render()};
-$("openOnly").onchange=e=>{st.openOnly=e.target.checked;render()};
-$("country").onchange=e=>{st.country=e.target.value;st.version=0;save();connect()};
-$("alertDate").onchange=()=>{save();if($("alertDate").value&&"Notification"in window&&Notification.permission==="default")Notification.requestPermission()};
+const st = { cc: store.get("cc", ""), visa: store.get("visa", ""), rows: new Map(), posts: [], cfg: {}, flash: new Set() };
+{ const q = new URLSearchParams(location.search).get("country"); if (q) st.cc = q.toUpperCase(); }
 
-async function getJSON(u){const r=await fetch(u);if(!r.ok)throw new Error(r.status);return r.json()}
+const getJSON = async (u, o) => { const r = await fetch(u, o); const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error(j.error || r.status); return j; };
+const toast = (msg) => { const t = $("toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("show"), 3200); };
 
-async function loadCountries(){
-  const d=await getJSON("/api/countries");const sel=$("country");
-  sel.length=1;
-  d.countries.forEach(c=>{const o=document.createElement("option");o.value=c.cc;o.textContent=`${c.country} (${c.posts})`;sel.appendChild(o)});
-  sel.value=st.country;
+// ---------- dates ----------
+const todayUTC = () => new Date(new Date().toISOString().slice(0, 10));
+const daysTo = (d) => Math.round((new Date(d) - todayUTC()) / 864e5);
+const fmt = (d, long) => { const t = new Date(d + "T00:00:00Z");
+  const o = { weekday: long ? "short" : undefined, day: "numeric", month: "short", timeZone: "UTC" };
+  if (t.getUTCFullYear() !== new Date().getFullYear()) o.year = "numeric";
+  return t.toLocaleDateString(undefined, o); };
+const inDays = (d) => { const n = daysTo(d); return n <= 0 ? "today" : n === 1 ? "tomorrow" : n < 60 ? `in ${n} days` : `in ${Math.round(n / 30.4)} months`; };
+const ago = (ms) => { const s = Math.max(0, (Date.now() - ms) / 1000); return s < 60 ? "just now" : s < 3600 ? `${Math.round(s / 60)} min ago` : `${Math.round(s / 3600)} h ago`; };
+const icoCheck = '<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><path d="M2.5 6.2l2.3 2.3 4.7-5"/></svg>';
+const trust = (r, short) => r.ok ? `<span class="tag ok">${icoCheck}${r.via === "extension" ? (short ? "Verified" : "From official site") : (short ? "Confirmed" : `Confirmed by ${r.reports} people`)}</span>`
+                          : `<span class="tag wait">1 report${short ? "" : ", waiting for a second"}</span>`;
+
+// ---------- tabs ----------
+function tab(name) {
+  document.querySelectorAll("nav button").forEach((b) => b.classList.toggle("on", b.dataset.tab === name));
+  ["slots", "report", "alerts"].forEach((t) => ($("tab-" + t).hidden = t !== name));
+  scrollTo(0, 0);
+  if (name === "alerts") refreshMine();
+  history.replaceState(null, "", name === "slots" ? location.pathname + location.search : "#" + name);
+}
+document.querySelectorAll("nav button").forEach((b) => (b.onclick = () => tab(b.dataset.tab)));
+
+// ---------- visa chips ----------
+function chips(box, value, onPick, withAny = true) {
+  box.innerHTML = "";
+  [...(withAny ? [""] : []), ...VISAS].forEach((v) => {
+    const b = document.createElement("button");
+    b.className = "chip" + (v === value ? " on" : "");
+    b.textContent = v ? v : "All visas";
+    if (v) b.title = VISA_NAMES[v];
+    b.onclick = () => { box.querySelectorAll(".chip").forEach((x) => x.classList.remove("on")); b.classList.add("on"); onPick(v); };
+    box.appendChild(b);
+  });
+}
+chips($("visaChips"), st.visa, (v) => { st.visa = v; store.set("visa", v); render(); });
+
+// ---------- country sheet ----------
+function openSheet() {
+  $("scrim").hidden = false; requestAnimationFrame(() => { $("scrim").classList.add("show"); $("sheet").classList.add("show"); });
+  $("sheetQ").value = ""; fillSheet(""); setTimeout(() => $("sheetQ").focus({ preventScroll: true }), 250);
+}
+function closeSheet() { $("scrim").classList.remove("show"); $("sheet").classList.remove("show"); setTimeout(() => ($("scrim").hidden = true), 200); }
+function fillSheet(q) {
+  q = q.trim().toLowerCase();
+  const items = [{ cc: "", country: "Everywhere", cities: [] }, ...st.posts].filter((p) => !q || p.country.toLowerCase().includes(q) || p.cc.toLowerCase() === q || p.cities.some((c) => c.toLowerCase().includes(q)));
+  $("sheetOpts").innerHTML = items.slice(0, 80).map((p) => `<button data-cc="${p.cc}" class="${p.cc === st.cc ? "on" : ""}"><span class="flag">${flag(p.cc)}</span>${esc(p.country)}<small>${p.cc ? p.cities.length + (p.cities.length > 1 ? " posts" : " post") : "earliest worldwide"}</small></button>`).join("");
+}
+$("countryBtn").onclick = openSheet;
+$("scrim").onclick = closeSheet;
+$("sheetQ").oninput = (e) => fillSheet(e.target.value);
+$("sheetOpts").onclick = (e) => { const b = e.target.closest("button"); if (!b) return; setCountry(b.dataset.cc); closeSheet(); };
+addEventListener("keydown", (e) => { if (e.key === "Escape") closeSheet(); });
+
+function setCountry(cc) {
+  st.cc = cc; store.set("cc", cc);
+  const p = st.posts.find((x) => x.cc === cc);
+  $("flag").textContent = flag(cc); $("countryName").textContent = p ? p.country : "Everywhere";
+  st.rows = new Map(); render(true); connect();
+  // keep the other tabs in step
+  if (cc) { $("rCountry").value = cc; $("aCountry").value = cc; fillCities("rCity", cc, false); fillCities("aCity", cc, true); updateTg(); }
 }
 
-let loading=0;
-async function load(){
-  const my=++loading;
-  const url=st.country?`/api/slots?country=${st.country}`:`/api/earliest?visa=${encodeURIComponent(st.visa)}`;
-  try{
-    const d=await getJSON(url);if(my!==loading)return;
-    st.rows=new Map(d.rows.map(r=>[r.key,r]));st.version=d.version;st.updatedAt=d.updatedAt;render();
-  }catch(e){console.warn(e)}
+// ---------- data ----------
+let loadSeq = 0;
+async function load() {
+  const my = ++loadSeq;
+  const url = st.cc ? `/api/slots?country=${st.cc}` : `/api/earliest?visa=${encodeURIComponent(st.visa)}`;
+  try { const d = await getJSON(url); if (my !== loadSeq) return; st.rows = new Map(d.rows.map((r) => [r.key, r])); render(); }
+  catch (e) { console.warn(e); }
 }
 
-const today=new Date().toISOString().slice(0,10);
-const days=d=>Math.round((new Date(d)-new Date(today))/864e5);
-const ago=ms=>{const s=Math.max(0,Math.round((Date.now()-ms)/1000));return s<60?s+"s ago":s<3600?Math.round(s/60)+"m ago":Math.round(s/3600)+"h ago"};
-const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function render(loading) {
+  if (loading) { $("list").innerHTML = '<div class="skel"></div><div class="skel"></div>'; return; }
+  const all = [...st.rows.values()].filter((r) => !st.visa || r.visa === st.visa);
+  const open = all.filter((r) => r.open > 0).sort((a, b) => (b.ok - a.ok) || a.earliest.localeCompare(b.earliest) || a.city.localeCompare(b.city));
+  const best = [...open].sort((a, b) => a.earliest.localeCompare(b.earliest)).find((r) => r.ok) || open[0];
 
-function visible(){
-  let rows=[...st.rows.values()].filter(r=>(!st.visa||r.visa===st.visa)&&(!st.cat||r.cat===st.cat)&&(!st.openOnly||r.open>0)&&(!st.q||r.city.toLowerCase().includes(st.q)||r.country.toLowerCase().includes(st.q)));
-  rows.sort((a,b)=>(a.earliest||"9999").localeCompare(b.earliest||"9999")||a.city.localeCompare(b.city));
-  return rows.slice(0,400);
-}
-function render(){
-  const rows=visible();
-  $("rows").innerHTML=rows.map(r=>{
-    const d=r.earliest?days(r.earliest):null;
-    const early=r.earliest?`<span class="date ${d<=30?"soon":""}">${r.earliest}</span> <span class="more">${d}d</span>`:`<span class="date none">none</span>`;
-    const next=(r.dates||[]).slice(1,4).join(", ");
-    return `<tr class="${st.flash.has(r.key)?"flash":""}"><td class="city"><b>${esc(r.city)}</b><span>${esc(r.country)}</span></td><td>${esc(r.visa)}</td><td><span class="pill ${r.cat==="Dropbox"?"drop":""}">${esc(r.cat)}</span></td><td>${early}</td><td class="more">${next}</td><td>${r.open}</td><td class="ago">${ago(r.changed)}</td><td class="ago">${esc(r.source)}</td></tr>`}).join("");
-  $("empty").hidden=rows.length>0;
-  $("empty").textContent=st.rows.size?"No open slots match these filters right now.":"No slots reported yet. Install the browser agent (extension folder), sign in to your visa account, and keep the appointment page open.";
+  // Hero
+  const hero = $("hero");
+  if (best) {
+    hero.classList.remove("empty");
+    $("heroEyebrow").textContent = st.cc ? "Earliest slot" : "Earliest slot anywhere";
+    $("heroDate").textContent = fmt(best.earliest, true);
+    $("heroWhere").textContent = `${best.city}${st.cc ? "" : ", " + best.country} · ${best.visa}${best.cat === "Dropbox" ? " · Dropbox" : ""} · ${inDays(best.earliest)}`;
+    $("heroMeta").innerHTML = `${trust(best)}<span>Checked ${ago(best.checked)}</span>`;
+  } else {
+    hero.classList.add("empty");
+    $("heroEyebrow").textContent = "Right now";
+    $("heroDate").textContent = "No open slots";
+    $("heroWhere").textContent = all.length ? "Every post reported recently is full." : "Nobody has reported a date here in the last 45 minutes.";
+    $("heroMeta").innerHTML = `<button class="btn accent small" onclick="tab('alerts')">Alert me when one opens</button><button class="btn ghost small" onclick="tab('report')">I saw one</button>`;
+  }
+
+  // List
+  $("listTitle").textContent = "Open now";
+  $("listCount").textContent = open.length ? `${open.length} ${open.length === 1 ? "slot" : "slots"}` : "";
+  $("list").hidden = !open.length;
+  $("list").innerHTML = open.slice(0, 300).map((r) => {
+    const n = daysTo(r.earliest);
+    const extra = [...(r.dates || [])].sort().slice(1, 5).map((d) => `<span>${fmt(d)}</span>`).join("");
+    return `<div class="row${st.flash.has(r.key) ? " flash" : ""}">
+      <div class="city">${esc(r.city)}${st.cc ? "" : `<span style="color:var(--mute);font-weight:400"> · ${esc(r.country)}</span>`}</div>
+      <div class="when ${n <= 30 ? "soon" : ""}">${fmt(r.earliest)}</div>
+      <div class="sub">${esc(r.visa)}${r.cat === "Dropbox" ? " · Dropbox" : ""} ${trust(r, true)}</div>
+      <div class="in">${inDays(r.earliest)} · ${ago(r.checked)}</div>
+      ${extra ? `<div class="more">${extra}${r.open > 5 ? `<span>+${r.open - 5}</span>` : ""}</div>` : ""}
+    </div>`;
+  }).join("");
+  const closed = [...new Set(all.filter((r) => !r.open).map((r) => r.city))];
+  $("closed").textContent = closed.length ? `Checked, nothing open: ${closed.slice(0, 20).join(", ")}${closed.length > 20 ? "…" : ""}` : "";
   st.flash.clear();
 }
 
-// Live updates
-let refetchTimer=null,es=null;
-function connect(){
-  if(es)es.close();
-  es=new EventSource("/api/stream"+(st.country?`?country=${st.country}`:""));
-  es.addEventListener("hello",()=>{$("dot").classList.add("on");$("conn").textContent="live";load()});
-  es.addEventListener("diff",e=>{
-    const d=JSON.parse(e.data);
-    if(st.version&&d.v!==st.version+1&&st.country){st.version=d.v;load();return}
-    st.version=d.v;st.updatedAt=Date.now();
-    alertCheck(d.changed);
-    if(!st.country){clearTimeout(refetchTimer);refetchTimer=setTimeout(load,300+Math.random()*1500);return}
-    for(const r of d.changed)if(r.cc===st.country){st.rows.set(r.key,r);st.flash.add(r.key)}
-    for(const k of d.removed||[])st.rows.delete(k);
+// Live updates: the server pushes only what changed.
+let es, tickTimer;
+function connect() {
+  if (es) es.close();
+  es = new EventSource("/api/stream" + (st.cc ? `?country=${st.cc}` : ""));
+  es.addEventListener("hello", () => { $("live").classList.add("on"); $("liveText").textContent = "Live"; load(); });
+  es.addEventListener("diff", (e) => {
+    const d = JSON.parse(e.data);
+    if (!st.cc) { clearTimeout(tickTimer); tickTimer = setTimeout(load, 400); return; }
+    for (const r of d.changed) { if (r.cc !== st.cc) continue; st.rows.set(r.key, r); if (r.open) st.flash.add(r.key); }
+    for (const k of d.removed || []) st.rows.delete(k);
     render();
   });
-  es.onerror=()=>{$("dot").classList.remove("on");$("conn").textContent="reconnecting"};
+  es.onerror = () => { $("live").classList.remove("on"); $("liveText").textContent = navigator.onLine ? "Reconnecting" : "Offline"; };
 }
-function alertCheck(changed){
-  const lim=$("alertDate").value;if(!lim||!("Notification"in window)||Notification.permission!=="granted")return;
-  const hit=changed.find(r=>r.earliest&&r.earliest<lim&&(!st.visa||r.visa===st.visa)&&(!st.cat||r.cat===st.cat)&&(!st.country||r.cc===st.country));
-  if(hit)new Notification(`Slot: ${hit.city} ${hit.visa} ${hit.cat}`,{body:`Earliest ${hit.earliest}`,tag:hit.key});
+setInterval(() => !$("tab-slots").hidden && st.rows.size && render(), 30000);
+
+// ---------- pickers for report + alerts ----------
+function fillCountries(id) {
+  $(id).innerHTML = `<option value="">Choose a country</option>` + st.posts.map((p) => `<option value="${p.cc}">${flag(p.cc)}  ${esc(p.country)}</option>`).join("");
+}
+function fillCities(id, cc, any) {
+  const p = st.posts.find((x) => x.cc === cc);
+  $(id).innerHTML = (any ? `<option value="">Any consulate</option>` : "") + (p ? p.cities.map((c) => `<option>${esc(c)}</option>`).join("") : "");
 }
 
-async function pollMeta(){
-  try{
-    const [m,s]=await Promise.all([getJSON("/metrics"),getJSON("/api/sources")]);
-    const p=m.server_latency.p99_us;$("p99").textContent=`server p99 ${p<1000?p.toFixed(0)+" µs":(p/1000).toFixed(2)+" ms"}`;
-    const mock=s.sources.some(x=>x.name.startsWith("mock:"));
-    $("banner").hidden=!mock;$("banner").textContent="Simulated data is ON (server started with -mock). Rows from mock:* sources are not real; rows from browser-agent are.";
-    $("sources").innerHTML=s.sources.map(x=>`<span class="src ${x.healthy?"":"bad"}">${esc(x.name)}: ${x.rows} rows, fetch ${x.fetchMs} ms${x.consecutiveFailures?`, ${x.consecutiveFailures} failures`:""}</span>`).join("")+`<span>${m.sse_clients} live viewers</span>`;
-  }catch{}
-}
-setInterval(()=>{if(st.updatedAt)$("updated").textContent="updated "+ago(st.updatedAt)},1000);
-setInterval(pollMeta,5000);
+// Report
+const rep = { visa: "", cat: "Regular", dates: [] };
+chips($("rVisa"), "", (v) => (rep.visa = v), false);
+$("rCat").onclick = (e) => { const b = e.target.closest("button"); if (!b) return; rep.cat = b.dataset.v; $("rCat").querySelectorAll("button").forEach((x) => x.classList.toggle("on", x === b)); };
+$("rCountry").onchange = (e) => fillCities("rCity", e.target.value, false);
+$("rNone").onchange = (e) => { $("rDateField").hidden = e.target.checked; $("rSend").textContent = e.target.checked ? "Report no slots" : "Share slot"; };
+$("rDate").min = new Date().toISOString().slice(0, 10);
+const addDate = () => { const v = $("rDate").value; if (v && !rep.dates.includes(v)) rep.dates.push(v); rep.dates.sort(); $("rDate").value = ""; drawDates(); };
+$("rAdd").onclick = addDate;
+function drawDates() { $("rDates").innerHTML = rep.dates.map((d) => `<button data-d="${d}">${fmt(d, true)} <span aria-hidden="true">×</span></button>`).join(""); }
+$("rDates").onclick = (e) => { const b = e.target.closest("button"); if (b) { rep.dates = rep.dates.filter((d) => d !== b.dataset.d); drawDates(); } };
+$("rSend").onclick = async () => {
+  if ($("rDate").value) addDate();
+  const cc = $("rCountry").value, city = $("rCity").value, none = $("rNone").checked;
+  if (!cc || !city) return toast("Choose the country and consulate.");
+  if (!rep.visa) return toast("Choose the visa type.");
+  if (!none && !rep.dates.length) return toast("Add the date you saw, or switch on Nothing open.");
+  $("rSend").disabled = true;
+  try {
+    const r = await getJSON("/api/report", { method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ agent: "app", via: "app", cc, visa: rep.visa, cat: rep.cat, checkedAt: Date.now(), posts: [{ city, dates: none ? [] : rep.dates }] }) });
+    if (!r.accepted?.length) throw new Error("That consulate wasn't recognised.");
+    toast(none ? "Thanks, marked as full." : r.confirmed ? "Thanks! It's confirmed and alerts are going out." : "Thanks! It shows as confirmed once one more person reports it.");
+    rep.dates = []; drawDates(); $("rNone").checked = false; $("rNone").onchange({ target: $("rNone") });
+    if (st.cc !== cc) setCountry(cc);
+    setTimeout(() => tab("slots"), 900);
+  } catch (e) { toast("Couldn't share: " + e.message); }
+  $("rSend").disabled = false;
+};
 
-loadCountries().then(load);pollMeta();connect();
+// Alerts
+const al = { visa: store.get("aVisa", "") };
+chips($("aVisa"), al.visa, (v) => { al.visa = v; store.set("aVisa", v); updateTg(); });
+$("aCountry").onchange = (e) => { fillCities("aCity", e.target.value, true); updateTg(); };
+$("aCity").onchange = updateTg;
+function updateTg() {
+  if (!st.cfg.telegram) return;
+  const cc = $("aCountry").value;
+  const city = ($("aCity").value || "").normalize("NFD").replace(/[^A-Za-z ]/g, "").trim().replace(/ +/g, "_");
+  const payload = cc ? ["w", cc, (al.visa || "any").replace("/", ""), city].filter(Boolean).join("_").slice(0, 64) : "";
+  $("tgBtn").href = `https://t.me/${st.cfg.telegram}` + (payload ? `?start=${payload}` : "");
+}
+
+const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+const standalone = matchMedia("(display-mode: standalone)").matches || navigator.standalone;
+const pushOK = "serviceWorker" in navigator && "PushManager" in window && "Notification" in window;
+
+function b64(s) { const p = "=".repeat((4 - (s.length % 4)) % 4); const r = atob((s + p).replace(/-/g, "+").replace(/_/g, "/")); return Uint8Array.from([...r].map((c) => c.charCodeAt(0))); }
+async function subscription(create) {
+  const reg = await navigator.serviceWorker.ready;
+  let sub = await reg.pushManager.getSubscription();
+  if (!sub && create) {
+    const { key } = await getJSON("/api/push/key");
+    sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64(key) });
+  }
+  return sub;
+}
+$("pushBtn").onclick = async () => {
+  const cc = $("aCountry").value;
+  if (!cc) return toast("Choose a country first.");
+  if (!pushOK) return toast(isIOS ? "On iPhone, add this app to your Home Screen first." : "This browser can't do alerts. Try Telegram.");
+  $("pushBtn").disabled = true;
+  try {
+    if ((await Notification.requestPermission()) !== "granted") throw new Error("Notifications are blocked in settings.");
+    const sub = await subscription(true);
+    await getJSON("/api/push/watch", { method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ sub, cc, visa: al.visa, city: $("aCity").value, before: $("aBefore").value }) });
+    toast("Alert on. We'll notify you the moment a slot opens.");
+    refreshMine();
+  } catch (e) { toast(e.message); }
+  $("pushBtn").disabled = false;
+};
+async function refreshMine() {
+  if (!pushOK || !navigator.serviceWorker.controller && !(await navigator.serviceWorker.getRegistration())) return;
+  try {
+    const sub = await subscription(false);
+    if (!sub) { $("mineCard").hidden = true; return; }
+    const list = await getJSON("/api/push/list", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ endpoint: sub.endpoint }) });
+    $("mineCard").hidden = !list.length;
+    const name = (cc) => st.posts.find((p) => p.cc === cc)?.country || cc;
+    $("mine").innerHTML = list.map((w) => `<div class="mine"><div><b>${flag(w.cc)} ${esc(w.city || "Any consulate")}, ${esc(name(w.cc))}</b><small>${esc(w.visa || "Any visa")}${w.before ? " · before " + fmt(w.before) : ""}</small></div><button class="x" data-id="${w.id}">Remove</button></div>`).join("");
+    $("mine").onclick = async (e) => { const b = e.target.closest("button"); if (!b) return;
+      await getJSON("/api/push/unwatch", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ endpoint: sub.endpoint, id: b.dataset.id }) }).catch(() => {});
+      refreshMine(); };
+  } catch (e) { console.warn(e); }
+}
+
+// Install
+let installEvt = null;
+addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); installEvt = e; $("installCard").hidden = false; $("installBtn").hidden = false; });
+$("installBtn").onclick = async () => { if (!installEvt) return; installEvt.prompt(); await installEvt.userChoice; installEvt = null; $("installCard").hidden = true; };
+if (isIOS && !standalone) {
+  $("installCard").hidden = false;
+  $("installText").innerHTML = "On iPhone: tap <b>Share</b> then <b>Add to Home Screen</b>. Open it from there to turn on alerts.";
+  $("pushText").textContent = "On iPhone this works once the app is on your Home Screen (iOS 16.4 or later).";
+}
+
+// ---------- start ----------
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js").catch(() => {});
+(async () => {
+  try {
+    [st.posts, st.cfg] = await Promise.all([getJSON("/api/posts"), getJSON("/api/config")]);
+  } catch (e) { toast("Can't reach the server."); }
+  fillCountries("rCountry"); fillCountries("aCountry");
+  if (st.cfg.telegram) $("tgCard").hidden = false;
+  setCountry(st.posts.some((p) => p.cc === st.cc) ? st.cc : "");
+  if (!st.cc) { fillCities("rCity", "", false); fillCities("aCity", "", true); }
+  updateTg();
+  const h = location.hash.slice(1); if (h === "report" || h === "alerts") tab(h);
+})();
 </script>
 </body>
 </html>
