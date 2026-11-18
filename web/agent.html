@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Visa Slot Agent</title>
+<meta name="description" content="Run the slot agent inside your own visa tab. Nothing to install.">
+<link rel="icon" href="/icons/favicon.png">
+<style>
+:root{
+  --bg:#f6f5f1;--card:#fff;--ink:#16181d;--soft:#4a4f58;--mute:#8a8f98;--line:#e9e7e1;--fill:#efede8;
+  --accent:#0e7c5a;--accent-ink:#fff;--accent-soft:#e3f3ec;
+  --shadow:0 1px 2px rgba(20,20,20,.04),0 4px 16px rgba(20,20,20,.04);
+  --sans:ui-sans-serif,-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#0f1012;--card:#18191c;--ink:#eeeff1;--soft:#b7bbc2;--mute:#7d828b;--line:#26282c;--fill:#202226;
+  --accent:#3ddc97;--accent-ink:#06261a;--accent-soft:#12291f;--shadow:none}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 var(--sans);-webkit-font-smoothing:antialiased}
+.wrap{max-width:560px;margin:0 auto;padding:24px 16px 60px}
+a{color:var(--accent)}
+.back{font-size:14px;text-decoration:none}
+h1{font-size:30px;line-height:1.1;letter-spacing:-.025em;margin:16px 0 6px}
+.lede{color:var(--soft);margin:0 0 20px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;margin:0 0 14px;box-shadow:var(--shadow)}
+h2{font-size:17px;margin:0 0 10px;letter-spacing:-.01em}
+ol{margin:0;padding-left:20px;display:grid;gap:10px;color:var(--soft)}
+ol b{color:var(--ink)}
+.bm{display:inline-flex;align-items:center;gap:8px;background:var(--accent);color:var(--accent-ink);font-weight:700;text-decoration:none;
+  padding:11px 18px;border-radius:999px;cursor:grab;margin:4px 0}
+.bm.wait{opacity:.5;pointer-events:none}
+.btn{font:inherit;font-weight:650;border:1px solid var(--line);background:var(--fill);color:var(--ink);border-radius:999px;padding:8px 14px;cursor:pointer}
+.note{font-size:13px;color:var(--mute)}
+ul{margin:0;padding-left:18px;color:var(--soft);display:grid;gap:6px}
+.ok{color:var(--accent);font-weight:650;font-size:13px;margin-left:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="/">← Slots</a>
+  <h1>Run the agent in your visa tab</h1>
+  <p class="lede">No extension, no app. A bookmark runs the agent inside your logged-in visa account, checks every consulate for you, alerts you, and shares the dates here for everyone.</p>
+
+  <div class="card">
+    <h2>On a computer</h2>
+    <ol>
+      <li><b>Drag this button to your bookmarks bar.</b><br>
+        <a class="bm wait" id="bm" href="#" onclick="event.preventDefault();alert('Drag this button to your bookmarks bar, then click it on your visa site.')">Visa agent</a>
+        <div class="note">No bookmarks bar? Press Ctrl+Shift+B (Cmd+Shift+B on Mac).</div></li>
+      <li><b>Log in to your visa account</b> (ais.usvisa-info.com or usvisascheduling.com) and open the appointment or reschedule page, where you choose a consulate.</li>
+      <li><b>Click the bookmark.</b> A small panel opens in the corner. Choose your visa type and press <b>Start</b>.</li>
+      <li><b>Keep that tab open.</b> You can use other tabs. If you reload or get signed out, log in again and click the bookmark again.</li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <h2>On a phone</h2>
+    <ol>
+      <li><button class="btn" id="copyBm">Copy the bookmark</button><span class="ok" id="copied" hidden>Copied</span></li>
+      <li>Bookmark any page, then edit that bookmark: name it <b>Visa agent</b> and paste the copied text as its address.</li>
+      <li>On your visa appointment page, run it. <b>Chrome:</b> type “Visa agent” in the address bar and tap the bookmark. <b>Safari:</b> open Bookmarks and tap it.</li>
+    </ol>
+    <p class="note">Phones pause pages in the background, so checks only run while the visa tab is on screen. A computer works better for leaving it running.</p>
+  </div>
+
+  <div class="card">
+    <h2>Good to know</h2>
+    <ul>
+      <li>It never logs in or solves a CAPTCHA. You log in yourself; it works inside that session.</li>
+      <li>It does what you would do by hand: picks each consulate in the dropdown, a few seconds apart, every 10 minutes by default (5 at least).</li>
+      <li>You get a sound, a browser notification and a flashing tab title when an earlier date opens. Turn on alerts on the <a href="/#alerts">Alerts tab</a> to also get them on your phone.</li>
+      <li>Its dates show here as <b>Verified</b>, because they come straight from the booking site.</li>
+      <li>Your settings stay in your browser. Nothing about your account is sent, only consulate names and open dates.</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h2>Which visa sites it works on</h2>
+    <ul>
+      <li><b>ais.usvisa-info.com</b> (Canada, Mexico, Brazil, Colombia, Europe and others): works.</li>
+      <li><b>usvisascheduling.com</b> (India, China, Nigeria and others): this site has strict security rules that can stop bookmarks. If clicking the bookmark does nothing, or the panel says uploads are blocked, use the Chrome extension there instead.</li>
+    </ul>
+  </div>
+</div>
+<script>
+(async () => {
+  const strip = (src) => src.split("\n").map((l) => l.trim()).filter((l) => l && !l.startsWith("//")).join("\n");
+  const [lib, agent] = await Promise.all([fetch("/lib.js").then((r) => r.text()), fetch("/bookmarklet.js").then((r) => r.text())]);
+  const code = "(()=>{" + strip(lib) + "\n" + strip(agent).replace("__VSA_SERVER__", location.origin) + "})()";
+  const href = "javascript:" + encodeURIComponent(code);
+  const bm = document.getElementById("bm");
+  bm.href = href; bm.classList.remove("wait");
+  document.getElementById("copyBm").onclick = async () => {
+    try { await navigator.clipboard.writeText(href); document.getElementById("copied").hidden = false; }
+    catch { prompt("Copy this:", href); }
+  };
+})();
+</script>
+</body>
+</html>

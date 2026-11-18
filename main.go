@@ -23,6 +23,11 @@ import (
 //go:embed web
 var webFS embed.FS
 
+// Shared by the extension and the bookmarklet (agent.html glues it in front of bookmarklet.js).
+//
+//go:embed extension/lib.js
+var libJS []byte
+
 type feedFlags []string
 
 func (f *feedFlags) String() string     { return strings.Join(*f, ",") }
@@ -156,10 +161,18 @@ func main() {
 	})
 	static, _ := fs.Sub(webFS, "web")
 	files := http.FileServerFS(static)
+	api.HandleFunc("GET /lib.js", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "text/javascript; charset=utf-8")
+		w.Header().Set("Cache-Control", "no-cache")
+		w.Write(libJS)
+	})
+	api.HandleFunc("GET /agent", func(w http.ResponseWriter, r *http.Request) { http.Redirect(w, r, "/agent.html", http.StatusFound) })
 	api.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
 		switch {
 		case r.URL.Path == "/" || r.URL.Path == "/sw.js":
 			w.Header().Set("Cache-Control", "no-cache") // app updates reach phones on next open
+		case r.URL.Path == "/agent.html" || r.URL.Path == "/bookmarklet.js":
+			w.Header().Set("Cache-Control", "no-cache")
 		case strings.HasPrefix(r.URL.Path, "/icons/"):
 			w.Header().Set("Cache-Control", "public, max-age=86400")
 		}

@@ -4,6 +4,7 @@ COPY go.mod go.sum ./
 RUN go mod download
 COPY *.go ./
 COPY web ./web
+COPY extension/lib.js ./extension/lib.js
 RUN CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o /server .
 
 # Runs as root so it can write to the Fly volume mounted at /data.
