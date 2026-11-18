@@ -173,7 +173,7 @@ func main() {
 			w.Header().Set("Cache-Control", "no-cache") // app updates reach phones on next open
 		case r.URL.Path == "/agent.html" || r.URL.Path == "/bookmarklet.js":
 			w.Header().Set("Cache-Control", "no-cache")
-		case strings.HasPrefix(r.URL.Path, "/icons/"):
+		case strings.HasPrefix(r.URL.Path, "/icons/") || strings.HasPrefix(r.URL.Path, "/media/"):
 			w.Header().Set("Cache-Control", "public, max-age=86400")
 		}
 		if r.URL.Path == "/manifest.webmanifest" {

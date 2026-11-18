@@ -33,6 +33,9 @@ ol b{color:var(--ink)}
 .btn{font:inherit;font-weight:650;border:1px solid var(--line);background:var(--fill);color:var(--ink);border-radius:999px;padding:8px 14px;cursor:pointer}
 .note{font-size:13px;color:var(--mute)}
 ul{margin:0;padding-left:18px;color:var(--soft);display:grid;gap:6px}
+.demo{margin:0 0 16px}
+.demo video{display:block;width:100%;aspect-ratio:16/9;border-radius:18px;border:1px solid var(--line);background:#000;box-shadow:var(--shadow)}
+.demo figcaption{font-size:13px;color:var(--mute);margin-top:6px}
 .ok{color:var(--accent);font-weight:650;font-size:13px;margin-left:8px}
 </style>
 </head>
@@ -41,6 +44,11 @@ ul{margin:0;padding-left:18px;color:var(--soft);display:grid;gap:6px}
   <a class="back" href="/">← Slots</a>
   <h1>Run the agent in your visa tab</h1>
   <p class="lede">No extension, no app. A bookmark runs the agent inside your logged-in visa account, checks every consulate for you, alerts you, and shares the dates here for everyone.</p>
+
+  <figure class="demo">
+    <video src="/media/agent-demo.mp4" poster="/media/agent-demo.jpg" autoplay muted loop playsinline controls preload="metadata"></video>
+    <figcaption>25-second demo on a test copy of the visa site (simulated slots, waits between consulates shortened).</figcaption>
+  </figure>
 
   <div class="card">
     <h2>On a computer</h2>
